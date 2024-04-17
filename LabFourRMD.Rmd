@@ -12,23 +12,62 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
-install.packages("rvest")
-install.packages("dplyr")
 library(rvest)
 library(dplyr)
+library(tidyr)
+library(purrr)
+library(stringr)
 
 url <- "https://www.baseball-reference.com/awards/hof_2023.shtml"
-
 web_page <- read_html(url)
 
 data_table <- web_page %>%
-  html_nodes("table#some_table_id") %>%
-  html_table()
+  html_table(header = TRUE, fill = TRUE) %>%
+  .[[1]] 
 
 
 head(data_table)
+```
+
+```{r}
+base_url <- "https://www.baseball-reference.com/awards/hof_YEAR.shtml"
+years <- 1936:2022
+urls <- str_replace_all(base_url, "YEAR", as.character(years))
+
+scrape_hof_data <- function(url) {
+  page <- read_html(url)
+  tables <- html_table(page, fill = TRUE)
+  data <- tables[[1]]  
+  
+  if(any(is.na(names(data)))) {
+    warning("The table in ", url, " has NA column names. Assigning default names.")
+    names(data) <- paste("V", 1:ncol(data), sep = "")  
+  }
+  
+  clean_data <- data %>%
+    mutate(Year = as.integer(str_extract(url, "\\d{4}"))) %>%
+    rename(
+      Rank = Rk,
+      Name = Name,
+      YearOnBallot = YoB,
+      NumberOfVotes = Votes,
+      PercentOfVotes = `%vote`
+    ) %>%
+    select(Rank, Name, YearOnBallot, NumberOfVotes, PercentOfVotes, Year)
+  
+  return(clean_data)
+}
 
 
+
+```
+
+```{r}
+test_url <- "https://www.baseball-reference.com/awards/hof_1975.shtml"
+test_data <- scrape_hof_data(test_url)
+head(test_data)
+
+hof_data <- map_df(urls, scrape_hof_data)
 
 ```
 
