@@ -1,0 +1,34 @@
+---
+title: "progress-report-<NickOlech>.Rmd"
+author: "Nick Olech"
+date: "2024-04-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+install.packages("rvest")
+install.packages("dplyr")
+library(rvest)
+library(dplyr)
+
+url <- "https://www.baseball-reference.com/awards/hof_2023.shtml"
+
+web_page <- read_html(url)
+
+data_table <- web_page %>%
+  html_nodes("table#some_table_id") %>%
+  html_table()
+
+
+head(data_table)
+
+
+
+```
+
