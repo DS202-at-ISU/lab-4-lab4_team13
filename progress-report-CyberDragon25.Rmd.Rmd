@@ -1,0 +1,14 @@
+---
+title: "progress-report-CyberDragon25.Rmd"
+author: "Subham Bhattacharya (NetID: shubham8)"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Lab 4: (shubham8) Scraping (into) the Hall of Fame
+
+

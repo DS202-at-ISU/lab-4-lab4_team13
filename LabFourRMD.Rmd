@@ -2,7 +2,9 @@
 title: "progress-report-<NickOlech>.Rmd"
 author: "Nick Olech"
 date: "2024-04-17"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
