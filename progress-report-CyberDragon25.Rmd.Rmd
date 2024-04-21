@@ -10,5 +10,78 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Lab 4: (shubham8) Scraping (into) the Hall of Fame
+```{r}
+# Load necessary libraries
+library(rvest)
+library(dplyr)
+
+# URL of the webpage with Hall of Fame voting records for 2023
+url <- "https://www.baseball-reference.com/awards/hof_2023.shtml"
+
+# Read the HTML content of the webpage
+page <- read_html(url)
+
+# Extract the table containing the Hall of Fame voting records
+table <- page %>% html_table(fill = TRUE)
+
+# Clean the extracted table
+hall_of_fame_2023 <- table[[1]]  # Assuming it's the first table on the page
+
+# View the structure of the extracted table
+str(hall_of_fame_2023)
+
+library(Lahman)
+head(HallOfFame, 3)
+
+```
 
 
+```{r}
+# Load necessary libraries
+library(rvest)
+library(dplyr)
+library(Lahman)
+
+# URL of the webpage with Hall of Fame voting records for 2023
+url <- "https://www.baseball-reference.com/awards/hof_2023.shtml"
+
+# Read the HTML content of the webpage
+page <- read_html(url)
+
+# Extract the table containing the Hall of Fame voting records
+table <- page %>% html_table(fill = TRUE)
+
+# Clean the extracted table
+hall_of_fame_2023 <- table[[1]]  # Assuming it's the first table on the page
+
+# Rename columns to match the structure of HallOfFame data
+colnames(hall_of_fame_2023) <- c("playerID", "yearID", "votedBy", "ballots", "needed", "votes", "inducted", "category", "needed_note")
+
+# Convert necessary columns to appropriate data types
+hall_of_fame_2023$yearID <- as.integer(hall_of_fame_2023$yearID)
+hall_of_fame_2023$ballots <- as.integer(hall_of_fame_2023$ballots)
+hall_of_fame_2023$needed <- as.integer(hall_of_fame_2023$needed)
+hall_of_fame_2023$votes <- as.integer(hall_of_fame_2023$votes)
+hall_of_fame_2023$inducted <- ifelse(hall_of_fame_2023$inducted == "Y", "Y", "N")  # Convert to "Y" or "N"
+
+# Append the new data frame to the existing HallOfFame data frame
+HallOfFame <- bind_rows(HallOfFame, hall_of_fame_2023)
+
+# Save the updated HallOfFame data frame back to the Lahman package
+save(HallOfFame, file = "HallOfFame.rda", compress = "xz")
+
+```
+
+```{r}
+library(ggplot2)
+HallOfFame %>% 
+  ggplot(aes(x = yearID, fill = inducted)) +
+  geom_bar() +
+  xlim(c(1936, 2022))
+```
+
+```{r}
+# creating the csv file
+write.csv(HallOfFame, "HallOfFame.csv", row.names = FALSE)
+
+```
